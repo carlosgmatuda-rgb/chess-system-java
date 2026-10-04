@@ -16,16 +16,8 @@ public class Board {
         return rows;
     }
 
-    public void setRows(int rows) {
-        this.rows = rows;
-    }
-
     public int getColumns() {
         return columns;
-    }
-
-    public void setColumns(int columns) {
-        this.columns = columns;
     }
 
     public Piece piece(int row, int column) {
@@ -34,5 +26,22 @@ public class Board {
 
     public Piece piece(Position position) {
         return pieces[position.getRow()][position.getColumn()];
+    }
+
+    public void placePiece(Position position, Piece piece) {
+        pieces[position.getRow()][position.getColumn()] = piece;
+        piece.position = position;
+    }
+
+    private boolean positionExists(int row, int columns) {
+        return row >= 0 && row < row && columns >= 0 && columns < columns;
+    }
+
+    public boolean positionExists(Position position) {
+        return positionExists(position.getRow(), position.getColumn());
+    }
+
+    public boolean thereIsAPiece(Position position) {
+        return piece(position) != null;
     }
 }
