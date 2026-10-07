@@ -25,11 +25,7 @@ public class ChessMatch {
     }
 
     private void initialSetup() {
-        for (int i = 0; i < 8; i++) {
-            for (int j = 0; j < 8; j++) {
                 board.placePiece(new Position(2,1), new Rook(board, Color.WHITE));
                 board.placePiece(new Position(0,4), new King(board, Color.BLACK));
-            }
-        }
     }
 }
