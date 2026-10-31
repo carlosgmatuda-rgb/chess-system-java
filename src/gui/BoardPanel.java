@@ -4,13 +4,10 @@ import chess.ChessException;
 import chess.ChessMatch;
 import chess.ChessPiece;
 import chess.ChessPosition;
-import chess.Color;
 import chess.pieces.King;
 
-import javax.swing.JButton;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import java.awt.Font;
 import java.awt.GridLayout;
 import java.util.ArrayList;
 import java.util.List;
@@ -22,17 +19,10 @@ public class BoardPanel extends JPanel {
         void onError(String message);
     }
 
-    private static final java.awt.Color LIGHT = new java.awt.Color(0xF0D9B5);
-    private static final java.awt.Color DARK = new java.awt.Color(0xB58863);
-    private static final java.awt.Color MOVE = new java.awt.Color(0x6FA8DC);
-    private static final java.awt.Color CAPTURE = new java.awt.Color(0xE57373);
-    private static final java.awt.Color SELECTED = new java.awt.Color(0xF6E05E);
-    private static final java.awt.Color CHECK = new java.awt.Color(0xFF3B3B);
-
     private final ChessMatch chessMatch;
     private final Listener listener;
     private final List<ChessPiece> captured = new ArrayList<>();
-    private final JButton[][] squares = new JButton[8][8];
+    private final SquareButton[][] squares = new SquareButton[8][8];
 
     private int sourceRow = -1;
     private int sourceCol = -1;
@@ -45,12 +35,7 @@ public class BoardPanel extends JPanel {
 
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
-                JButton b = new JButton();
-                b.setFont(new Font("Dialog", Font.PLAIN, 44));
-                b.setFocusPainted(false);
-                b.setBorderPainted(false);
-                b.setOpaque(true);
-                b.setForeground(java.awt.Color.BLACK);
+                SquareButton b = new SquareButton(i, j);
                 final int row = i;
                 final int col = j;
                 b.addActionListener(e -> onClick(row, col));
@@ -87,6 +72,7 @@ public class BoardPanel extends JPanel {
                 } else {
                     select(i, j);
                 }
+                listener.onMatchUpdated();
             } else {
                 performMove(i, j);
             }
@@ -127,7 +113,7 @@ public class BoardPanel extends JPanel {
                 "Promoção", JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE,
                 null, names, names[0]);
         if (choice < 0) {
-            choice = 0; // fechou a janela: rainha
+            choice = 0; // closed the window: queen
         }
         chessMatch.replacePromotedPiece(types[choice]);
     }
@@ -143,21 +129,16 @@ public class BoardPanel extends JPanel {
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
                 ChessPiece p = pieces[i][j];
-                JButton b = squares[i][j];
-                b.setText(p == null ? "" : PieceSymbols.of(p));
 
-                java.awt.Color bg = ((i + j) % 2 == 0) ? LIGHT : DARK;
-
-                if (chessMatch.getCheck() && p instanceof King && p.getColor() == chessMatch.getCurrentPlayer()) {
-                    bg = CHECK;
-                }
+                SquareButton.Mark mark = SquareButton.Mark.NONE;
                 if (possibleMoves != null && possibleMoves[i][j]) {
-                    bg = (p != null) ? CAPTURE : MOVE;
+                    mark = (p != null) ? SquareButton.Mark.CAPTURE : SquareButton.Mark.MOVE;
                 }
-                if (i == sourceRow && j == sourceCol) {
-                    bg = SELECTED;
-                }
-                b.setBackground(bg);
+                boolean selected = (i == sourceRow && j == sourceCol);
+                boolean check = chessMatch.getCheck() && p instanceof King
+                        && p.getColor() == chessMatch.getCurrentPlayer();
+
+                squares[i][j].setState(p, selected, check, mark);
             }
         }
         repaint();

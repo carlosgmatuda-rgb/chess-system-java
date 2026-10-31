@@ -11,7 +11,7 @@ public class MainGUI {
         try {
             UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
         } catch (Exception e) {
-            // segue com o look and feel padrão
+            // it follows the standard look and feel
         }
         SwingUtilities.invokeLater(() -> new ChessWindow().setVisible(true));
     }
